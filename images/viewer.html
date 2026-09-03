@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 角色预览</title>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #f0f0f0; font-family: -apple-system, sans-serif; }
+  model-viewer { width: 100vw; height: 100vh; --poster-color: transparent; }
+  .hint { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; pointer-events: none; }
+</style>
+</head>
+<body>
+  <model-viewer src="character.glb" camera-controls auto-rotate shadow-intensity="1" exposure="1.1"></model-viewer>
+  <div class="hint">鼠标拖动旋转 · 滚轮缩放</div>
+</body>
+</html>

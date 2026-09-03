@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>北辰青年 Work · My Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"></noscript>
+<style>
+  :root{
+    --ink: #4a4458; --ink-soft: #7b7488;
+    --glass: rgba(255,255,255,0.55);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color:var(--ink); min-height:100vh; overflow-x:hidden;
+    background:#f6f1f7;
+  }
+  .bg{
+    position:fixed; inset:-20%; z-index:-2;
+    background:linear-gradient(115deg, #F9CFE4 0%, #FAD9C6 22%, #E8D8F4 48%, #D2F2DE 72%, #D4EAF8 100%);
+    background-size:300% 300%;
+    animation:drift 24s ease-in-out infinite;
+    will-change:background-position;
+  }
+  @keyframes drift{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+  .blob{ position:fixed; z-index:-1; border-radius:50%; pointer-events:none; will-change:transform; }
+  .b1{ width:520px; height:520px; top:-140px; left:-120px; background:radial-gradient(circle, rgba(255,214,236,0.55) 0%, rgba(255,214,236,0) 68%); animation:float1 18s ease-in-out infinite; }
+  .b2{ width:460px; height:460px; bottom:-120px; right:-100px; background:radial-gradient(circle, rgba(214,234,255,0.55) 0%, rgba(214,234,255,0) 68%); animation:float2 22s ease-in-out infinite; }
+  .b3{ width:380px; height:380px; top:38%; left:52%; background:radial-gradient(circle, rgba(219,242,226,0.5) 0%, rgba(219,242,226,0) 68%); animation:float1 20s ease-in-out infinite reverse; }
+  @keyframes float1{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(40px,30px,0); } }
+  @keyframes float2{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(-30px,-40px,0); } }
+
+  .ppt-header{
+    position:fixed; top:0; left:0; width:100%;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:var(--glass);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    border-bottom:1px solid rgba(255,255,255,0.7);
+    z-index:100;
+  }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 22px; border-radius:999px;
+    font-size:15px; font-weight:700; text-decoration:none;
+    border:none; cursor:pointer;
+    background:#fff; color:var(--ink);
+    box-shadow:0 8px 20px rgba(150,110,160,0.15);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .back-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(150,110,160,0.22); }
+  .header-title{
+    font-family:'Playfair Display','Times New Roman',serif;
+    font-size:clamp(20px, 3vw, 28px); font-weight:600; color:#2a2528;
+    letter-spacing:0.5px;
+  }
+
+  .stage{ padding:80px 22px 70px; max-width:1100px; margin:0 auto; }
+
+  .group{
+    margin-bottom:42px;
+  }
+  .group-title{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fredoka',sans-serif;
+    font-size:clamp(20px, 2.6vw, 28px);
+    font-weight:700; color:#2a2528;
+    margin-bottom:18px;
+  }
+  .group-title::before{
+    content:''; display:block;
+    width:6px; height:24px; border-radius:3px;
+    background:linear-gradient(180deg, #ff7aa8, #b79cf0);
+  }
+  .group-sub{
+    font-size:14px; font-weight:600; color:var(--ink-soft);
+    margin:-12px 0 18px 16px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+  }
+  .grid.cols-2{ grid-template-columns:repeat(2, 1fr); }
+  .grid.cols-1{ grid-template-columns:1fr; }
+
+  .card{
+    background:#fff; border-radius:20px; overflow:hidden;
+    box-shadow:0 14px 32px rgba(100,80,120,0.12);
+    transition:transform .3s cubic-bezier(0.22,1,0.36,1), box-shadow .3s ease;
+    display:flex; flex-direction:column;
+    cursor:pointer;
+  }
+  .card:hover{ transform:translateY(-5px); box-shadow:0 22px 50px rgba(100,80,120,0.2); }
+  .card .thumb{
+    aspect-ratio:3 / 4;
+    background:#f3edf5;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    padding:8px;
+  }
+  .card .thumb img{
+    max-width:100%; max-height:100%;
+    width:100%; height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .card .body{
+    padding:14px 18px 16px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .card h3{
+    font-family:'Fredoka',sans-serif;
+    font-size:18px; font-weight:700; color:#2a2528; line-height:1.25;
+    min-height:1.25em;
+  }
+  .card .meta{
+    display:flex; align-items:center; justify-content:space-between; margin-top:2px;
+  }
+  .card .tag{
+    display:inline-block; padding:3px 10px; border-radius:999px;
+    font-size:11px; font-weight:700;
+    background:linear-gradient(135deg, #ffe0ef, #ffc2dd); color:#a13a6a;
+  }
+  .card .tag.team{ background:linear-gradient(135deg, #dff0ff, #bcdcff); color:#2c5687; }
+  .card .tag.recruit{ background:linear-gradient(135deg, #fff1d6, #ffe0a8); color:#8a5a1a; }
+  .card .tag.manual{ background:linear-gradient(135deg, #dff5e9, #bce8cf); color:#2c7553; }
+
+  /* 外部链接卡片（公众号推文 / 校企背书） */
+  .card.link-card{ background:linear-gradient(135deg, #fff5fa, #f5f0ff); }
+  .card.link-card .thumb{
+    aspect-ratio:1 / 1;
+    background:linear-gradient(135deg, #ff7aa8, #b79cf0);
+    color:#fff;
+  }
+  .card.link-card .thumb .ico{
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px;
+  }
+  .card.link-card .body{ padding:18px 22px 20px; }
+  .card.link-card .go{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:700; color:#e97ab5;
+    margin-top:4px;
+  }
+
+  /* 团队网站主图：宽屏单卡 */
+  .feature{
+    background:#fff; border-radius:24px; overflow:hidden;
+    box-shadow:0 16px 38px rgba(100,80,120,0.14);
+    display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr);
+    cursor:pointer;
+    transition:transform .3s cubic-bezier(0.22,1,0.36,1), box-shadow .3s ease;
+  }
+  .feature:hover{ transform:translateY(-5px); box-shadow:0 22px 56px rgba(100,80,120,0.22); }
+  .feature .pic{
+    aspect-ratio:16/9; background:#0a0a14; padding:0;
+  }
+  .feature .pic img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .feature .info{
+    padding:28px 30px;
+    display:flex; flex-direction:column; gap:12px; justify-content:center;
+  }
+  .feature h3{
+    font-family:'Fredoka',sans-serif;
+    font-size:24px; font-weight:700; color:#2a2528; line-height:1.2;
+  }
+  .feature p{ font-size:14px; color:#6b5e72; line-height:1.6; }
+  .feature .go{
+    display:inline-flex; align-items:center; gap:6px;
+    align-self:flex-start; margin-top:6px;
+    font-size:14px; font-weight:700; color:#e97ab5;
+  }
+
+  @media (max-width:900px){
+    .grid{ grid-template-columns:repeat(2, 1fr); }
+    .feature{ grid-template-columns:1fr; }
+  }
+  @media (max-width:780px){
+    .ppt-header{ padding:14px 16px; }
+    .back-btn{ padding:10px 16px; font-size:14px; }
+    .header-title{ display:none; }
+    .stage{ padding:90px 16px 60px; }
+    .grid{ grid-template-columns:1fr; gap:16px; }
+    .feature .info{ padding:20px 22px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <header class="ppt-header">
+    <button class="back-btn" id="backBtn">← Back to Portfolio</button>
+    <div class="header-title">北辰青年 Work</div>
+    <div style="width:140px"></div>
+  </header>
+
+  <main class="stage" id="stage">
+    <!-- 个人说明书 -->
+    <section class="group">
+      <h2 class="group-title">个人说明书</h2>
+      <p class="group-sub">写给团队的「我」的操作手册 · 春山</p>
+      <div class="grid cols-1">
+        <div class="card" data-src="images/bcyy/01_personal_manual.jpg">
+          <div class="thumb"><img src="images/bcyy/01_personal_manual.jpg" alt="时代个人说明书" loading="lazy" draggable="false"></div>
+          <div class="body">
+            <h3>时代个人说明书</h3>
+            <div class="meta"><span class="tag manual">个人手册</span><span class="go">查看大图 →</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 团队网站 -->
+    <section class="group">
+      <h2 class="group-title">团队网站搭建</h2>
+      <p class="group-sub">Emoji Team · 6 天把想法做出来</p>
+      <div class="feature" data-url="https://w-jerry1112.github.io/emoji-team-site">
+        <div class="pic"><img src="images/bcyy/02_emoji_team.png" alt="Emoji Team" loading="lazy" draggable="false"></div>
+        <div class="info">
+          <h3>Emoji Team</h3>
+          <p>让每一种不同都在场 · 移动鼠标，扰动这片星系，点击任意 Emoji，认识同频的「我」。</p>
+          <span class="go">访问网站 →</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 团队延伸海报 -->
+    <section class="group">
+      <h2 class="group-title">团队延伸海报</h2>
+      <p class="group-sub">行动路径 / 团队公约 / 团队分配 · 让协作可被看见</p>
+      <div class="grid cols-2" id="extendGrid">
+        <div class="card" data-src="images/bcyy/03_up_emoji.jpg">
+          <div class="thumb"><img src="images/bcyy/03_up_emoji.jpg" alt="UP Emoji Team" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>UP Emoji Team</h3><div class="meta"><span class="tag team">团队</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/04_action_path.jpg">
+          <div class="thumb"><img src="images/bcyy/04_action_path.jpg" alt="行动路径" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>行动路径</h3><div class="meta"><span class="tag team">流程</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/05_team_pact.jpg">
+          <div class="thumb"><img src="images/bcyy/05_team_pact.jpg" alt="团队公约" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>团队公约</h3><div class="meta"><span class="tag team">约定</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/06_team_roles.jpg">
+          <div class="thumb"><img src="images/bcyy/06_team_roles.jpg" alt="团队分配 · 五层能力" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>团队分配 · 五层能力</h3><div class="meta"><span class="tag team">成员</span><span class="go">查看大图 →</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 招新海报 -->
+    <section class="group">
+      <h2 class="group-title">招新海报</h2>
+      <p class="group-sub">COME ON! 校园团队成员招募中</p>
+      <div class="grid" id="recruitGrid">
+        <div class="card" data-src="images/bcyy/07_recruit_joinus.jpg">
+          <div class="thumb"><img src="images/bcyy/07_recruit_joinus.jpg" alt="北辰青年 Join Us" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>北辰青年 · Join Us</h3><div class="meta"><span class="tag recruit">招新</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/08_recruit_about.jpg">
+          <div class="thumb"><img src="images/bcyy/08_recruit_about.jpg" alt="关于我们" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>关于我们</h3><div class="meta"><span class="tag recruit">招新</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/09_recruit_truth.jpg">
+          <div class="thumb"><img src="images/bcyy/09_recruit_truth.jpg" alt="一些实话" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>一些实话</h3><div class="meta"><span class="tag recruit">招新</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/10_recruit_you.jpg">
+          <div class="thumb"><img src="images/bcyy/10_recruit_you.jpg" alt="关于你" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>关于你</h3><div class="meta"><span class="tag recruit">招新</span><span class="go">查看大图 →</span></div></div>
+        </div>
+        <div class="card" data-src="images/bcyy/11_recruit_gain.jpg">
+          <div class="thumb"><img src="images/bcyy/11_recruit_gain.jpg" alt="收获" loading="lazy" draggable="false"></div>
+          <div class="body"><h3>收获</h3><div class="meta"><span class="tag recruit">招新</span><span class="go">查看大图 →</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 招新外部链接 -->
+    <section class="group">
+      <h2 class="group-title">招新 · 外部资源</h2>
+      <p class="group-sub">公众号推文 / 校企联合背书文档</p>
+      <div class="grid cols-2">
+        <div class="card link-card" data-url="https://c.xiumius.cn/board/v5/7L7gN/716714462?share_depth=1">
+          <div class="thumb"><div class="ico">📰</div></div>
+          <div class="body">
+            <h3>招新公众号推文</h3>
+            <p style="font-size:13px;color:#6b5e72;line-height:1.6">完整招新介绍 · 项目亮点 · 加入方式</p>
+            <span class="go">查看推文 →</span>
+          </div>
+        </div>
+        <div class="card link-card" data-url="https://ncne9ctip61w.feishu.cn/file/ApbTbFjA2o0tkaxkFPHcF3yanxg?from=from_copylink">
+          <div class="thumb"><div class="ico">📄</div></div>
+          <div class="body">
+            <h3>校企联合背书文档</h3>
+            <p style="font-size:13px;color:#6b5e72;line-height:1.6">飞书文档 · 校企合作背书材料</p>
+            <span class="go">查看文档 →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 大图查看 -->
+  <div class="viewer" id="viewer" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(8,8,16,0.88);backdrop-filter:blur(20px);padding:32px">
+    <button id="viewerClose" style="position:absolute;top:20px;right:24px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.18);font-size:24px;cursor:pointer;transition:transform .25s ease, background .25s ease" aria-label="关闭">×</button>
+    <div style="max-width:min(900px,92vw);max-height:90vh;display:flex;align-items:center;justify-content:center">
+      <img id="viewerImg" src="" alt="" style="max-width:100%;max-height:90vh;width:auto;height:auto;object-fit:contain;border-radius:14px;background:#fff;padding:14px;box-shadow:0 30px 100px rgba(0,0,0,0.6)">
+    </div>
+  </div>
+
+<script>
+  // 大图查看
+  const viewer = document.getElementById('viewer');
+  const viewerImg = document.getElementById('viewerImg');
+  const viewerClose = document.getElementById('viewerClose');
+
+  function showViewer(src){
+    viewerImg.src = src;
+    viewer.style.display = 'flex';
+  }
+  function hideViewer(){
+    viewer.style.display = 'none';
+    viewerImg.src = '';
+  }
+  viewerClose.addEventListener('click', hideViewer);
+  viewer.addEventListener('click', e => { if (e.target === viewer) hideViewer(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && viewer.style.display === 'flex') hideViewer();
+  });
+  viewerClose.addEventListener('mouseenter', ()=> viewerClose.style.background = 'rgba(255,255,255,0.22)');
+  viewerClose.addEventListener('mouseleave', ()=> viewerClose.style.background = 'rgba(255,255,255,0.12)');
+
+  // 卡片点击：图卡片 → 大图；链接卡片 → 新窗口
+  document.querySelectorAll('.card').forEach(c => {
+    c.addEventListener('click', e => {
+      e.preventDefault();
+      if (c.dataset.url) {
+        window.open(c.dataset.url, '_blank', 'noopener');
+      } else if (c.dataset.src) {
+        showViewer(c.dataset.src);
+      }
+    });
+  });
+  document.querySelectorAll('.feature').forEach(f => {
+    f.addEventListener('click', () => {
+      if (f.dataset.url) window.open(f.dataset.url, '_blank', 'noopener');
+    });
+  });
+
+  // 返回
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (history.length > 1) history.back();
+    else window.location.href = 'index.html#projects';
+  });
+</script>
+</body>
+</html>

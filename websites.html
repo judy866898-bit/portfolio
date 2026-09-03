@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vibe Coding Website · My Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"></noscript>
+<style>
+  :root{
+    --ink: #4a4458; --ink-soft: #7b7488;
+    --glass: rgba(255,255,255,0.55);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color:var(--ink); min-height:100vh; overflow-x:hidden;
+    background:#f6f1f7;
+  }
+  .bg{
+    position:fixed; inset:-20%; z-index:-2;
+    background:linear-gradient(115deg, #F9CFE4 0%, #FAD9C6 22%, #E8D8F4 48%, #D2F2DE 72%, #D4EAF8 100%);
+    background-size:300% 300%;
+    animation:drift 24s ease-in-out infinite;
+    will-change:background-position;
+  }
+  @keyframes drift{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+  .blob{
+    position:fixed; z-index:-1; border-radius:50%; pointer-events:none; will-change:transform;
+  }
+  .b1{ width:520px; height:520px; top:-140px; left:-120px; background:radial-gradient(circle, rgba(255,214,236,0.55) 0%, rgba(255,214,236,0) 68%); animation:float1 18s ease-in-out infinite; }
+  .b2{ width:460px; height:460px; bottom:-120px; right:-100px; background:radial-gradient(circle, rgba(214,234,255,0.55) 0%, rgba(214,234,255,0) 68%); animation:float2 22s ease-in-out infinite; }
+  .b3{ width:380px; height:380px; top:38%; left:52%; background:radial-gradient(circle, rgba(219,242,226,0.5) 0%, rgba(219,242,226,0) 68%); animation:float1 20s ease-in-out infinite reverse; }
+  @keyframes float1{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(40px,30px,0); } }
+  @keyframes float2{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(-30px,-40px,0); } }
+
+  .ppt-header{
+    position:fixed; top:0; left:0; width:100%;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:var(--glass);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    border-bottom:1px solid rgba(255,255,255,0.7);
+    z-index:100;
+  }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 22px; border-radius:999px;
+    font-size:15px; font-weight:700; text-decoration:none;
+    border:none; cursor:pointer;
+    background:#fff; color:var(--ink);
+    box-shadow:0 8px 20px rgba(150,110,160,0.15);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .back-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(150,110,160,0.22); }
+  .header-title{
+    font-family:'Playfair Display','Times New Roman',serif;
+    font-size:clamp(20px, 3vw, 28px); font-weight:600; color:#2a2528;
+    letter-spacing:0.5px;
+  }
+
+  .stage{
+    padding:80px 22px 70px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .stage-intro{
+    text-align:center; max-width:680px; margin-bottom:36px;
+  }
+  .stage-intro h1{
+    font-family:'Fredoka',sans-serif; font-size:clamp(32px, 5.5vw, 56px);
+    font-weight:700; color:#ff7aa8; line-height:1.1; margin-bottom:8px;
+    text-shadow:
+      0 1px 0 #f06693, 0 2px 0 #e85a88, 0 3px 0 #df4e7d,
+      0 4px 0 #d64272, 0 5px 0 #cc3667, 0 6px 0 #c22a5c,
+      0 7px 1px rgba(120,20,70,0.22), 0 9px 7px rgba(120,20,70,0.28);
+  }
+  .stage-intro p{
+    font-size:15px; color:var(--ink-soft); line-height:1.6;
+  }
+
+  .web-grid{
+    width:min(1100px, 94vw);
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+    gap:24px;
+  }
+  .web-card{
+    background:#fff;
+    border-radius:22px;
+    overflow:hidden;
+    cursor:pointer;
+    box-shadow:0 16px 38px rgba(100,80,120,0.14);
+    transition:transform .3s cubic-bezier(0.22,1,0.36,1), box-shadow .3s ease;
+    display:flex; flex-direction:column;
+    will-change:transform;
+  }
+  .web-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 24px 60px rgba(100,80,120,0.22);
+  }
+  .web-card .thumb{
+    aspect-ratio: 16 / 9;
+    background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    padding:14px;
+    border-bottom:1px solid rgba(150,130,160,0.10);
+  }
+  .web-card .thumb img{
+    max-width:100%; max-height:100%;
+    width:100%; height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .web-card .body{
+    padding:18px 22px 22px;
+    display:flex; flex-direction:column; gap:10px;
+    flex:1;
+  }
+  .web-card h3{
+    font-family:'Fredoka',sans-serif;
+    font-size:22px; font-weight:700; color:#2a2528;
+    line-height:1.25;
+  }
+  .web-card p{
+    font-size:14px; color:#6b5e72; line-height:1.6; flex:1;
+  }
+  .web-card .meta{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:4px;
+  }
+  .web-card .tag{
+    display:inline-block; padding:4px 12px; border-radius:999px;
+    font-size:12px; font-weight:700;
+    background:linear-gradient(135deg, #ffe0ef, #ffc2dd);
+    color:#a13a6a;
+  }
+  .web-card .tag.local{
+    background:linear-gradient(135deg, #dff0ff, #bcdcff);
+    color:#2c5687;
+  }
+  .web-card .go{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:700; color:#e97ab5;
+    transition:transform .2s ease;
+  }
+  .web-card:hover .go{ transform:translateX(3px); }
+  .web-card.disabled{ cursor:not-allowed; }
+  .web-card.disabled .go{ color:#9a8aa3; }
+  .web-card.disabled:hover{ transform:none; box-shadow:0 16px 38px rgba(100,80,120,0.14); }
+
+  @media (max-width:780px){
+    .ppt-header{ padding:14px 16px; }
+    .back-btn{ padding:10px 16px; font-size:14px; }
+    .header-title{ display:none; }
+    .stage{ padding:90px 16px 60px; }
+    .web-grid{ grid-template-columns:1fr; gap:18px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <header class="ppt-header">
+    <button class="back-btn" id="backBtn">← Back to Portfolio</button>
+    <div class="header-title">Vibe Coding Website</div>
+    <div style="width:140px"></div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="web-grid" id="grid">
+      <!-- 卡片由 JS 注入，方便维护 -->
+    </div>
+  </main>
+
+<script>
+  const sites = [
+    {
+      title: 'Emoji 情绪小岛',
+      desc: '选一个最能代表此刻心情的 emoji，玩 6 款小游戏、生成专属状态海报，把心情大声说出来。',
+      img: 'images/websites/web_01_emoji.png',
+      url: 'https://judy866898-bit.github.io/emoji-state/',
+      tag: 'HTML · CSS · JS'
+    },
+    {
+      title: '霍格沃茨：午夜密室回响',
+      desc: '在霍格沃茨的午夜回廊中，用魔杖与逻辑解开密室谜题，寻找里德尔留下的真相。',
+      img: 'images/websites/web_02_hogwarts.png',
+      url: 'https://ac7adb7c45ac491bb5137a67890f73d9.app.workbuddy.link',
+      tag: '互动解谜'
+    },
+    {
+      title: '像素数独',
+      desc: '🌈 彩色像素风数独，从新手村一路闯到大师关，用纯逻辑点亮 9×9 棋盘！',
+      img: 'images/websites/web_03_sudoku.png',
+      url: 'https://6f55308a374141628f23133f7f525dd9.app.workbuddy.link',
+      tag: '逻辑 · 闯关'
+    },
+    {
+      title: '褪色档案',
+      desc: '1979 年冬至前夜，你在一间只剩黑与白的档案室里醒来。打字机自己会动，三段证词里藏着说谎者，抽屉里那张照片里——站着你。',
+      img: 'images/websites/web_04_faded.png',
+      url: 'https://a0b122f340e345a5b3216d3ace837d55.app.workbuddy.link',
+      tag: '互动叙事'
+    },
+    {
+      title: '星喵太空咖啡馆',
+      desc: '在银河中转站经营一家永不打烊的猫咪咖啡馆，收集星际美食、聆听旅人故事、陪伴三只小猫解锁专属番外。',
+      img: 'images/websites/web_05_stellar.jpg',
+      url: 'https://90c0cbc86def42cc91147c2d2be46cd8.app.workbuddy.link',
+      tag: '经营 · 治愈'
+    },
+    {
+      title: '旧报遗书',
+      desc: '1998 年 11 月 14 日，明城晚报社，一封信被撕过两次的遗书牵出一桩密室死亡。',
+      img: 'images/websites/web_06_newspaper.jpg',
+      url: 'https://c3d2927b7e964675b12478db4aa0869c.app.workbuddy.link',
+      tag: '推理 · 悬疑'
+    },
+    {
+      title: '红楼梦 · 太虚幻境',
+      desc: '一卷《红楼梦》，一场太虚幻境的浮生大梦。',
+      img: 'images/websites/web_07_red.png',
+      url: 'https://396953558aae4cf3873256566f2a2239.bj3.agentos-app.net',
+      tag: '文化 · 沉浸'
+    },
+    {
+      title: '捏捏盲盒',
+      desc: '把坏心情轻轻捏掉 🫧 心情低落？捏一下，烦恼消散。',
+      img: 'images/websites/web_08_pin.png',
+      url: 'https://7b13325772a342049324026f6b04c4e0.bj4.agentos-app.net',
+      tag: '治愈 · 互动'
+    },
+    {
+      title: '海岛冷饮摊 · 轮回盛夏',
+      desc: '一座被困在 8 月 30 日的海岛冷饮摊，用一杯杯夏日特饮，温柔收尾那些没说出口的告别。',
+      img: 'images/websites/web_09_island.jpg',
+      url: 'https://64ab66117bd244b48d83a0ecfe5a517e.app.workbuddy.link',
+      tag: '治愈 · 叙事'
+    }
+  ];
+
+  const grid = document.getElementById('grid');
+  const frag = document.createDocumentFragment();
+  sites.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'web-card' + (s.local ? ' disabled' : '');
+
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    const img = document.createElement('img');
+    img.src = s.img; img.alt = s.title; img.loading = 'lazy'; img.draggable = false;
+    thumb.appendChild(img);
+
+    const body = document.createElement('div');
+    body.className = 'body';
+    body.innerHTML = `
+      <h3>${s.title}</h3>
+      <p>${s.desc}</p>
+      <div class="meta">
+        <span class="tag${s.local ? ' local' : ''}">${s.tag}</span>
+        <span class="go">${s.local ? '本地版' : '进入游戏 →'}</span>
+      </div>`;
+
+    card.appendChild(thumb);
+    card.appendChild(body);
+    frag.appendChild(card);
+
+    if (!s.local) {
+      card.addEventListener('click', () => window.open(s.url, '_blank', 'noopener'));
+    }
+  });
+  grid.appendChild(frag);
+
+  // 返回
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (history.length > 1) history.back();
+    else window.location.href = 'index.html#projects';
+  });
+</script>
+</body>
+</html>

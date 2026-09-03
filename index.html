@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Portfolio</title>
+<link rel="preload" href="images/folder.png" as="image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 字体改为非阻塞加载：先用系统字体即时渲染，字体到位后无缝替换，不卡首屏 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"></noscript>
+<!-- model-viewer 改为本地自托管 + 滚动到 About 附近才动态加载脚本（首屏不再等 1.1MB CDN） -->
+<style>
+  :root{
+    /* 低饱和糖果色 */
+    --candy-pink:   #FBD3E9;
+    --candy-peach:  #FCE3C8;
+    --candy-lav:    #E7DBF4;
+    --candy-mint:   #D6F0E4;
+    --candy-sky:    #D6E8F4;
+    --ink:          #4a4458;
+    --ink-soft:     #7b7488;
+    --glass:        rgba(255,255,255,0.55);
+    --glass-line:   rgba(255,255,255,0.7);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    cursor:none;                /* 隐藏系统指针，用 mac 风格指针 */
+    background:#f6f1f7;
+  }
+
+  /* 渐变糖果背景：低饱和、缓慢流动（饱和度假焊进颜色，不用 filter，避免每帧重算） */
+  .bg{
+    position:fixed; inset:-20%; z-index:-2;
+    background:linear-gradient(115deg,
+      #F9CFE4 0%,
+      #FAD9C6 22%,
+      #E8D8F4 48%,
+      #D2F2DE 72%,
+      #D4EAF8 100%);
+    background-size:300% 300%;
+    animation:drift 24s ease-in-out infinite;
+    will-change:background-position;
+  }
+  @keyframes drift{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+  /* 漂浮光斑：用 radial-gradient 代替 blur(60px)，视觉接近但几乎零渲染成本 */
+  .blob{
+    position:fixed; z-index:-1; border-radius:50%;
+    pointer-events:none;
+    will-change:transform;
+  }
+  .blob.b1{
+    width:520px; height:520px; top:-140px; left:-120px;
+    background:radial-gradient(circle, rgba(255,214,236,0.55) 0%, rgba(255,214,236,0) 68%);
+    animation:float1 18s ease-in-out infinite;
+  }
+  .blob.b2{
+    width:460px; height:460px; bottom:-120px; right:-100px;
+    background:radial-gradient(circle, rgba(214,234,255,0.55) 0%, rgba(214,234,255,0) 68%);
+    animation:float2 22s ease-in-out infinite;
+  }
+  .blob.b3{
+    width:380px; height:380px; top:38%; left:52%;
+    background:radial-gradient(circle, rgba(219,242,226,0.5) 0%, rgba(219,242,226,0) 68%);
+    animation:float1 20s ease-in-out infinite reverse;
+  }
+  @keyframes float1{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(40px,30px,0); } }
+  @keyframes float2{ 0%,100%{ transform:translate3d(0,0,0); } 50%{ transform:translate3d(-30px,-40px,0); } }
+
+  /* ===== 顶部导航：贴网页最上方、通栏 ===== */
+  nav{
+    position:fixed; top:0; left:0; width:100%;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:var(--glass);
+    backdrop-filter:blur(18px) saturate(1.2);
+    -webkit-backdrop-filter:blur(18px) saturate(1.2);
+    border-bottom:1px solid var(--glass-line);
+    z-index:100;
+  }
+  .brand{ width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg,#f7a8cf,#b79cf0); }
+  .nav-links{ display:flex; gap:4px; }
+  .nav-links a{
+    text-decoration:none; color:var(--ink-soft);
+    font-size:15px; font-weight:600;
+    padding:9px 18px; border-radius:14px;
+    transition:all .25s ease;
+  }
+  .nav-links a:hover{ color:var(--ink); background:rgba(255,255,255,0.6); }
+  .nav-links a.active{ color:#fff; background:linear-gradient(135deg,#f3a3cf,#b79cf0); box-shadow:0 4px 14px rgba(183,156,240,0.4); }
+
+  /* ===== 页面板块骨架 ===== */
+  section{
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    padding:90px 24px 60px;
+    position:relative;
+  }
+
+  /* ===== Home 首页：文件夹剧场 ===== */
+  #home{ gap:28px; }
+
+  /* ===== About 板块：左 3D 角色 + 右文字 ===== */
+  #about{
+    padding:120px 48px 80px;
+  }
+  .about-grid{
+    display:grid;
+    grid-template-columns:minmax(300px, 1fr) minmax(0, 1.55fr);
+    gap:36px;
+    align-items:center;
+    width:min(1100px, 92vw);
+    margin:0 auto;
+  }
+  .about-3d{
+    position:relative;
+    aspect-ratio:1 / 1;
+    width:100%;
+    max-width:460px;
+    margin:0 auto 0 -4vw;
+    background:radial-gradient(circle at 50% 60%, rgba(255,255,255,0.55), rgba(255,255,255,0.0) 70%);
+    border-radius:32px;
+  }
+  .about-3d model-viewer{
+    width:100%;
+    height:100%;
+    --poster-color:transparent;
+    background:transparent;
+  }
+  /* 隐藏 model-viewer 默认的黑色加载进度条 */
+  .about-3d model-viewer::part(default-progress-bar){
+    display:none;
+  }
+  .about-text{
+    position:relative;
+    min-height:440px;
+    display:flex;
+    align-items:center;
+  }
+  /* 右侧：自由浮动的关键词气泡卡 */
+  .bubble-field{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-content:center;
+    gap:26px 30px;
+    width:100%;
+  }
+  .bubble{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    max-width:270px;
+    padding:13px 22px;
+    border-radius:999px;
+    font-size:16px;
+    font-weight:700;
+    color:#5a4a63;
+    background:#fff;
+    box-shadow:0 10px 22px rgba(150,110,160,0.22);
+    line-height:1.25;
+    white-space:normal;
+    animation:bob var(--d,4s) ease-in-out infinite;
+    animation-delay:var(--delay,0s);
+    will-change:transform;
+  }
+  .bubble.c1{ background:linear-gradient(135deg,#ffe0ef,#ffc2dd); }
+  .bubble.c2{ background:linear-gradient(135deg,#e7dbff,#c9b6f5); }
+  .bubble.c3{ background:linear-gradient(135deg,#dff5e9,#bce8cf); }
+  .bubble.c4{ background:linear-gradient(135deg,#dff0ff,#bcdcff); }
+  .bubble.c5{ background:linear-gradient(135deg,#fff1d6,#ffe0a8); }
+  .bubble.c6{ background:linear-gradient(135deg,#ffe3e0,#ffc4bd); }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0) rotate(var(--r,0deg)); }
+    50%{ transform:translateY(-9px) rotate(var(--r,0deg)); }
+  }
+
+  /* About 板块标题：圆润饱满 + 立体挤出感的英文（悬在角色正上方） */
+  .about-title{
+    position:absolute;
+    top:-86px;
+    left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    text-align:center;
+    margin:0;
+    font-family:'Fredoka','Baloo 2',-apple-system,BlinkMacSystemFont,sans-serif;
+    font-weight:700;
+    font-size:clamp(40px, 6.4vw, 82px);
+    letter-spacing:1px;
+    line-height:1;
+    color:#ff7aa8;
+    text-shadow:
+      0 1px 0 #f06693,
+      0 2px 0 #e85a88,
+      0 3px 0 #df4e7d,
+      0 4px 0 #d64272,
+      0 5px 0 #cc3667,
+      0 6px 0 #c22a5c,
+      0 7px 1px rgba(120,20,70,0.22),
+      0 9px 7px rgba(120,20,70,0.28);
+    user-select:none;
+  }
+
+  /* ===== Contact 板块：左侧人物 + 右侧联系方式 ===== */
+  #contact{
+    min-height:100vh;
+    padding:120px 48px 60px;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .contact-grid{
+    display:grid;
+    grid-template-columns:minmax(240px, 0.85fr) minmax(0, 1.55fr);
+    gap:42px;
+    align-items:center;
+    width:min(1100px, calc(100% - 90px));
+    margin:0 30px 0 60px;
+  }
+  .contact-figure{
+    position:relative;
+    text-align:center;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .contact-title{
+    font-family:'Fredoka',-apple-system,BlinkMacSystemFont,sans-serif;
+    font-weight:700;
+    font-size:clamp(32px, 5vw, 62px);
+    letter-spacing:1px;
+    line-height:1;
+    color:#ff7aa8;
+    text-shadow:
+      0 1px 0 #f06693,
+      0 2px 0 #e85a88,
+      0 3px 0 #df4e7d,
+      0 4px 0 #d64272,
+      0 5px 0 #cc3667,
+      0 6px 0 #c22a5c,
+      0 7px 1px rgba(120,20,70,0.22),
+      0 9px 7px rgba(120,20,70,0.28);
+    user-select:none;
+    margin:0 0 18px;
+  }
+  .contact-girl{
+    width:100%; max-width:300px; height:auto;
+    filter:drop-shadow(0 26px 55px rgba(140,90,120,0.25));
+    animation:contactBob 3.2s ease-in-out infinite;
+  }
+  @keyframes contactBob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-12px); }
+  }
+  .contact-info{
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .contact-card{
+    background:var(--glass);
+    border:1px solid var(--glass-line);
+    border-radius:28px;
+    padding:34px 32px;
+    box-shadow:0 20px 60px rgba(120,80,140,0.12);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .contact-hello{
+    font-family:'Fredoka',-apple-system,BlinkMacSystemFont,sans-serif;
+    font-size:clamp(28px, 4vw, 42px);
+    font-weight:700;
+    color:#4a4458;
+    margin-bottom:22px;
+    line-height:1.2;
+  }
+  .contact-hello span{ margin-left:4px; }
+  .contact-row{
+    display:flex; align-items:center; gap:14px;
+    padding:18px 20px;
+    margin-bottom:14px;
+    background:rgba(255,255,255,0.6);
+    border-radius:18px;
+    text-decoration:none;
+    color:inherit;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .contact-row:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px rgba(140,80,130,0.12);
+    background:rgba(255,255,255,0.78);
+  }
+  .contact-icon{ font-size:24px; flex-shrink:0; }
+  .contact-label{
+    font-size:13px; font-weight:700; color:#9a8aa3;
+    text-transform:uppercase; letter-spacing:1px;
+    width:56px; flex-shrink:0;
+  }
+  .contact-value{
+    flex:1; font-size:17px; font-weight:600; color:#4a4458;
+    word-break:break-all;
+  }
+  .contact-note{
+    margin-top:10px; font-size:14px; color:#7b7488; line-height:1.65;
+    white-space:nowrap;
+  }
+  .site-footer{
+    display:none;
+  }
+
+  @media (max-width:780px){
+    #about{ padding:110px 20px 60px; }
+    .about-grid{
+      grid-template-columns:1fr;
+      gap:28px;
+      text-align:center;
+    }
+    .about-3d{ max-width:340px; }
+    .about-title{ top:-62px; }
+    .about-text{ min-height:auto; }
+    .bubble-field{ gap:18px 20px; }
+    .bubble{ max-width:240px; font-size:15px; padding:11px 17px; }
+    #projects{ padding:90px 18px 120px; }
+    #projects .section-title{ margin-bottom:40px; font-size:clamp(30px, 9vw, 48px); }
+    .folder-wall{ width:100%; }
+    .folder-item,
+    .folder-item:nth-child(odd),
+    .folder-item:nth-child(even){
+      width:100%;
+      --push:0px;
+      margin-top:-14px;
+      align-self:stretch;
+    }
+    .folder-item:first-child{ margin-top:0; }
+    .folder-row{ height:78px; }
+    .folder-tab-label{
+      width:60px;
+      padding:14px 10px 10px 14px;
+      font-size:10px;
+    }
+    .folder-body{ padding:0 18px; }
+    .folder-name{ font-size:clamp(26px, 7.5vw, 42px); }
+    .folder-preview{ width:86px; height:60px; }
+    .project-modal .modal-card{ padding:28px 24px; }
+    #contact{ padding:100px 20px 40px; }
+    .contact-grid{ grid-template-columns:1fr; gap:28px; text-align:center; width:min(1100px, 92vw); margin:0 auto; }
+    .contact-title{ margin-bottom:10px; }
+    .contact-girl{ max-width:280px; margin:0 auto; }
+    .contact-card{ padding:26px 22px; }
+    .contact-row{ padding:14px 16px; }
+    .contact-value{ font-size:15px; }
+    .contact-note{ white-space:normal; }
+    .site-footer{ display:none; }
+  }
+
+  .folder-scene{
+    position:relative;
+    width:min(340px, 78vw);
+    aspect-ratio:1 / 0.95;
+    display:flex; justify-content:center; align-items:flex-end;
+  }
+
+  /* 卡片层：初始藏在文件夹后面 */
+  .cards{
+    position:absolute; inset:0; z-index:5;
+    pointer-events:none;
+  }
+  .card{
+    position:absolute;
+    width:min(110px, 30vw);
+    top:42%; left:50%;
+    transform:translate(-50%,-50%) scale(0) rotate(0deg);
+    transform-origin:center bottom;
+    transition:transform .55s cubic-bezier(0.34,1.56,0.64,1), opacity .4s ease;
+    opacity:0;
+  }
+  .card img{
+    width:100%; height:auto;
+    border-radius:22px;
+    border:4px solid #fff;
+    box-shadow:0 14px 34px rgba(120,90,130,0.28);
+    display:block;
+  }
+
+  /* 卡片弹出后的扇形位置 — 确保从文件夹两侧和上方露出 */
+  .folder-scene.open .card.left{
+    transform:translate(calc(-50% - 155px), calc(-50% - 30px)) scale(1) rotate(-14deg);
+    opacity:1;
+    transition-delay:.05s;
+  }
+  .folder-scene.open .card.center{
+    transform:translate(-50%, calc(-50% - 118px)) scale(1) rotate(0deg);
+    opacity:1;
+    transition-delay:.15s;
+  }
+  .folder-scene.open .card.right{
+    transform:translate(calc(-50% + 155px), calc(-50% - 30px)) scale(1) rotate(14deg);
+    opacity:1;
+    transition-delay:.25s;
+  }
+
+  /* 文件夹：最前层 */
+  .folder{
+    position:relative; z-index:10;
+    width:min(260px, 62vw);
+    cursor:pointer;
+    transition:transform .2s cubic-bezier(0.34,1.56,0.64,1);
+    filter:drop-shadow(0 18px 40px rgba(190,120,170,0.35));
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .folder img{ width:100%; height:auto; display:block; }
+  .folder:hover{ transform:scale(1.04) rotate(-1deg); }
+  .folder:active{ transform:scale(0.96) rotate(1deg); }
+
+  /* ===== 文件夹上的眼睛（跟随鼠标）===== */
+  .eye{
+    position:absolute;
+    background:radial-gradient(circle at 35% 30%, #ffffff, #f0d6df);
+    border-radius:50%;
+    box-shadow:0 3px 8px rgba(120,60,90,0.35), inset 0 -4px 8px rgba(140,70,100,0.25);
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .eye > i{
+    position:absolute; left:50%; top:50%;
+    width:48%; aspect-ratio:1 / 1;
+    background:radial-gradient(circle at 35% 30%, #2a2a2a, #050505);
+    border-radius:50%;
+    transform:translate(calc(-50% + var(--eye-tx,0px)), calc(-50% + var(--eye-ty,0px)));
+    transition:transform .12s ease-out;
+  }
+  .eye > i::after{
+    content:''; position:absolute;
+    width:32%; height:32%;
+    left:24%; top:18%;
+    background:rgba(255,255,255,0.85);
+    border-radius:50%;
+  }
+  .eye-left{
+    left:10.1%; top:27.2%;
+    width:9.6%; height:14.6%;
+  }
+  .eye-right{
+    left:18.9%; top:30.3%;
+    width:9.6%; height:14.6%;
+  }
+
+  /* My Portfolio 文字：抠出后透明，上下浮动 */
+  .portfolio-text{
+    width:min(360px, 76vw);
+    margin-top:32px;
+    animation:upDown 2.8s ease-in-out infinite;
+    filter:drop-shadow(0 10px 22px rgba(230,110,160,0.28));
+  }
+  .portfolio-text img{ width:100%; height:auto; display:block; }
+  @keyframes upDown{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-12px); }
+  }
+
+  /* 其它板块：仅保留名字占位 */
+  .section-title{
+    font-size:clamp(44px, 10vw, 120px);
+    font-weight:900; letter-spacing:-2px;
+    background:linear-gradient(120deg,#e97ab5,#9b7fe0 60%,#6fb6d6);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    opacity:.92;
+  }
+
+  /* ===== Projects 板块：文件夹标签墙 ===== */
+  #projects{
+    min-height:100vh;
+    padding:120px 5vw 160px;
+    display:flex; flex-direction:column;
+    align-items:flex-start;
+  }
+  #projects .section-title{
+    font-size:clamp(34px, 5.2vw, 62px);
+    margin:0 0 46px 0;
+    align-self:flex-start;
+  }
+  .folder-wall{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .folder-item{
+    position:relative;
+    cursor:pointer;
+    transition:transform .35s cubic-bezier(0.34,1.56,0.64,1), z-index 0s;
+    will-change:transform;
+    width:calc(100% - var(--push, 0px));
+    margin-top:-22px;
+  }
+  .folder-item:first-child{ margin-top:0; }
+  /* 奇数从左侧长出，偶数从右侧长出，形成交错 */
+  .folder-item:nth-child(odd){ --push:0px; align-self:flex-start; width:100%; }
+  .folder-item:nth-child(even){ --push:20px; align-self:flex-end; width:calc(100% - 20px); }
+
+  .folder-row{
+    display:flex;
+    align-items:stretch;
+    height:clamp(92px, 13vw, 128px);
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 16px 38px rgba(100,80,120,0.10);
+  }
+  /* 左侧小 tab */
+  .folder-tab-label{
+    width:clamp(72px, 10vw, 108px);
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:18px 16px 16px 22px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    color:rgba(40,38,44,0.42);
+    clip-path:polygon(0 0, 100% 0, 82% 100%, 0 100%);
+    position:relative;
+  }
+  .folder-tab-label::after{
+    content:''; position:absolute; right:6px; top:14px; bottom:14px;
+    width:1px; background:rgba(40,38,44,0.10);
+  }
+  /* 主体 */
+  .folder-body{
+    flex:1;
+    display:flex;
+    align-items:center;
+    padding:0 clamp(24px, 4vw, 50px);
+    position:relative;
+  }
+  .folder-name{
+    font-family:'Playfair Display','Times New Roman',serif;
+    font-size:clamp(32px, 5.2vw, 58px);
+    font-weight:600;
+    color:#2a2528;
+    line-height:1.05;
+    letter-spacing:-0.5px;
+  }
+
+  .folder-item:hover{ transform:translateY(-6px) scale(1.012); z-index:10; }
+  .folder-item:hover .folder-row{ box-shadow:0 24px 54px rgba(100,80,120,0.18); }
+
+  /* 文件夹颜色：糖果色但偏莫兰迪单色块 */
+  .folder-item:nth-child(1) .folder-row{ background:#f8c9dd; }
+  .folder-item:nth-child(1) .folder-tab-label{ background:#f2b8d2; }
+  .folder-item:nth-child(2) .folder-row{ background:#fbd6c2; }
+  .folder-item:nth-child(2) .folder-tab-label{ background:#f5c2a8; }
+  .folder-item:nth-child(3) .folder-row{ background:#e9ddf5; }
+  .folder-item:nth-child(3) .folder-tab-label{ background:#dcc8ee; }
+  .folder-item:nth-child(4) .folder-row{ background:#d8f1e2; }
+  .folder-item:nth-child(4) .folder-tab-label{ background:#c2e8d2; }
+  .folder-item:nth-child(5) .folder-row{ background:#d9eaf7; }
+  .folder-item:nth-child(5) .folder-tab-label{ background:#c4ddf1; }
+
+  /* 悬停时跳出的作品预览图 */
+  .folder-previews{
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    pointer-events:none;
+    z-index:20;
+  }
+  .folder-preview{
+    position:absolute;
+    width:132px; height:92px;
+    border-radius:10px;
+    object-fit:cover;
+    border:3px solid #fff;
+    box-shadow:0 14px 32px rgba(80,60,100,0.28);
+    opacity:0;
+    transform:scale(0.6) translateY(20px) rotate(var(--rot, 0deg));
+    transition:all .45s cubic-bezier(0.34,1.56,0.64,1);
+    transition-delay:var(--delay, 0s);
+    left:var(--x, 18%);
+    bottom:50%;
+  }
+  .folder-item:hover .folder-preview{
+    opacity:1;
+    transform:scale(1) translateY(var(--pop-y, -145px)) rotate(var(--rot, 0deg));
+  }
+  /* Posters 文件夹的预览：竖版海报需要 contain，避免横版尺寸裁剪 */
+  .folder-item[data-project="Posters"] .folder-preview{
+    width:78px; height:108px;
+    object-fit:contain;
+    background:#fff;
+  }
+  /* Vibe Coding Website 的预览：横版截图，contain 避免被 132×92 裁剪 */
+  .folder-item[data-project="Vibe Coding Website"] .folder-preview{
+    width:124px; height:78px;
+    object-fit:contain;
+    background:#fff;
+  }
+  /* Videos 的预览：封面竖横混排，contain 避免裁剪 */
+  .folder-item[data-project="Videos"] .folder-preview{
+    width:112px; height:92px;
+    object-fit:contain;
+    background:#fff;
+  }
+  /* 北辰青年 Work 的预览：竖版海报，contain 避免裁剪 */
+  .folder-item[data-project="北辰青年Work"] .folder-preview{
+    width:80px; height:110px;
+    object-fit:contain;
+    background:#fff;
+  }
+
+  /* ===== 项目详情弹窗 ===== */
+  .project-modal{
+    position:fixed; inset:0; z-index:200;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.78);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    opacity:0; visibility:hidden;
+    transition:opacity .35s ease, visibility .35s ease;
+  }
+  .project-modal.active{ opacity:1; visibility:visible; }
+  .project-modal .modal-card{
+    width:min(920px, 92vw);
+    max-height:88vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:28px;
+    box-shadow:0 30px 80px rgba(100,80,130,0.28);
+    padding:44px 48px;
+    transform:translateY(40px) scale(0.96);
+    transition:transform .35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .project-modal.active .modal-card{ transform:translateY(0) scale(1); }
+  .modal-header{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:28px;
+  }
+  .modal-title{
+    font-family:'Fredoka','Baloo 2',sans-serif;
+    font-size:clamp(32px, 5vw, 52px);
+    font-weight:700;
+    color:#5a4a63;
+    line-height:1.1;
+  }
+  .modal-close{
+    width:44px; height:44px; border-radius:50%;
+    border:none; background:#f3edf5; color:#5a4a63;
+    font-size:24px; cursor:pointer;
+    transition:transform .2s ease, background .2s ease;
+  }
+  .modal-close:hover{ transform:rotate(90deg); background:#e9e0ed; }
+  .modal-gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:18px;
+  }
+  .modal-gallery .placeholder{
+    aspect-ratio:4 / 3;
+    border-radius:16px;
+    background:linear-gradient(135deg, #f5f0f7, #e9e0ed);
+    display:flex; align-items:center; justify-content:center;
+    color:#9a8aa3; font-size:14px; font-weight:600;
+  }
+  /* ===== mac 风格指针 ===== */
+  .mac-cursor{
+    position:fixed; top:0; left:0; z-index:9999; pointer-events:none;
+    width:30px; height:30px;
+    transform-origin:6.1px 3.4px; /* 以箭头尖端为缩放原点 */
+    transition:transform .08s ease, opacity .2s ease;
+    will-change:transform;
+  }
+  .mac-cursor svg{ display:block; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+  .mac-ring{
+    position:fixed; top:0; left:0; z-index:9998; pointer-events:none;
+    width:46px; height:46px; border-radius:50%;
+    border:2px solid rgba(120,100,150,0.5);
+    transform:translate(-50%,-50%) scale(0);
+    transition:transform .22s ease, opacity .22s ease; opacity:0;
+  }
+  /* hover 时的缩放由 JS 写入 transform（内联样式优先级更高） */
+  body.hovering .mac-cursor{ opacity:.85; }
+  body.hovering .mac-ring{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+
+  @media (hover:none){ body{ cursor:auto; } .mac-cursor,.mac-ring{ display:none; } }
+
+  @media (max-width:640px){
+    nav{ padding:14px 16px; }
+    .nav-links a{ padding:8px 12px; font-size:14px; }
+    .folder-scene{ width:min(300px, 82vw); }
+    .folder{ width:min(220px, 60vw); }
+    .card{ width:min(95px, 28vw); top:44%; }
+    .folder-scene.open .card.left{ transform:translate(calc(-50% - 120px), calc(-50% - 22px)) scale(1) rotate(-12deg); }
+    .folder-scene.open .card.center{ transform:translate(-50%, calc(-50% - 90px)) scale(1); }
+    .folder-scene.open .card.right{ transform:translate(calc(-50% + 120px), calc(-50% - 22px)) scale(1) rotate(12deg); }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <!-- mac 风格指针 -->
+  <div class="mac-ring" id="ring"></div>
+  <div class="mac-cursor" id="cursor">
+    <svg width="30" height="30" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.5 2.5 L4.5 17.5 L8.2 13.9 L11 19.2 L13.1 18.1 L10.3 12.9 L15.4 12.6 Z"
+            fill="#1d1d1f" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- 顶部导航：贴最上方、通栏 -->
+  <nav>
+    <div class="brand"></div>
+    <div class="nav-links">
+      <a href="#home" class="active" data-target="home">Home</a>
+      <a href="#about" data-target="about">About</a>
+      <a href="#projects" data-target="projects">Projects</a>
+      <a href="#contact" data-target="contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Home：文件夹 + 弹出卡片 + My Portfolio -->
+  <section id="home">
+    <div class="folder-scene" id="scene">
+      <div class="cards">
+        <div class="card left"><img src="images/char1_raw.jpg" alt=""></div>
+        <div class="card center"><img src="images/char2_raw.jpg" alt=""></div>
+        <div class="card right"><img src="images/char3_raw.jpg" alt=""></div>
+      </div>
+      <div class="folder" id="folder">
+        <img src="images/folder.png" alt="folder">
+        <div class="eye eye-left"><i></i></div>
+        <div class="eye eye-right"><i></i></div>
+      </div>
+    </div>
+    <div class="portfolio-text">
+      <img src="images/portfolio.png" alt="My Portfolio">
+    </div>
+  </section>
+
+  <!-- 其余板块仅作占位 -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-3d">
+        <h2 class="about-title">About Me</h2>
+        <model-viewer id="charModel"
+          poster="images/character_preview.png"
+          alt="3D 角色"
+          camera-controls
+          auto-rotate
+          rotation-per-second="18deg"
+          shadow-intensity="0"
+          environment-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAABACAIAAABdtOgoAAAAqElEQVR4nO3TsQ0AIBADsYf910WigzHcnBdIccp6506cDbdTAK8HYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAKwBWAKwAWAGwAmAFwAqAFQArAFYArABYAbACYAXACoAVACsAVgCsAFgBsAJgBcAKgBUAK8BYH7dOA2x4/YiGAAAAAElFTkSuQmCC"
+          exposure="1.4"
+          tone-mapping="commerce"
+          interaction-prompt="none"
+          loading="lazy"
+          reveal="auto">
+        </model-viewer>
+      </div>
+      <div class="about-text">
+        <div class="bubble-field">
+          <span class="bubble c1" style="--d:4.4s;--delay:0s;--r:-2deg">📱 新媒体运营</span>
+          <span class="bubble c2" style="--d:3.8s;--delay:.4s;--r:1.5deg">🎬 短视频 · 图文创作</span>
+          <span class="bubble c3" style="--d:5.0s;--delay:.8s;--r:-1deg">💬 私域用户运营</span>
+          <span class="bubble c4" style="--d:4.2s;--delay:.2s;--r:2deg">🏆 国奖品牌策划</span>
+          <span class="bubble c5" style="--d:3.6s;--delay:.6s;--r:-1.5deg">✍️ 文案表达力</span>
+          <span class="bubble c6" style="--d:4.8s;--delay:1s;--r:1deg">🎨 视觉审美 + 排版</span>
+          <span class="bubble c1" style="--d:4.0s;--delay:.3s;--r:-2deg">🤖 AI 工作流</span>
+          <span class="bubble c2" style="--d:5.2s;--delay:.7s;--r:1.5deg">📖 CET-6 506</span>
+          <span class="bubble c3" style="--d:3.9s;--delay:.1s;--r:-1deg">📚 高绩点 4.14/4.5</span>
+          <span class="bubble c4" style="--d:4.6s;--delay:.5s;--r:2deg">🥇 连续两年校一等奖学金</span>
+          <span class="bubble c5" style="--d:4.1s;--delay:.9s;--r:-1.5deg">🎞️ 爱剪影视综</span>
+          <span class="bubble c6" style="--d:3.7s;--delay:.35s;--r:1deg">👣 脚踏实地</span>
+          <span class="bubble c1" style="--d:5.1s;--delay:.25s;--r:-2deg">🌱 北辰青年实习</span>
+          <span class="bubble c2" style="--d:4.3s;--delay:.65s;--r:1.5deg">📝 秀米公众号创作</span>
+          <span class="bubble c3" style="--d:4.5s;--delay:.15s;--r:-1deg">💻 喜欢 Vibe Coding 网站</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Projects：错落文件夹，hover 跳出作品图，点击打开详情 -->
+  <section id="projects">
+    <div class="section-title">Projects</div>
+    <div class="folder-wall">
+      <div class="folder-item" data-project="PPT">
+        <div class="folder-row">
+          <div class="folder-tab-label">01</div>
+          <div class="folder-body"><div class="folder-name">PPT</div></div>
+        </div>
+        <div class="folder-previews">
+          <img class="folder-preview" src="images/ppt/slide_1.png" style="--delay:0s;--pop-y:-115px;--rot:-2deg;--x:50%;margin-left:-66px;" alt="小红书运营求职作品集">
+        </div>
+      </div>
+      <div class="folder-item" data-project="Posters">
+        <div class="folder-row">
+          <div class="folder-tab-label">02</div>
+          <div class="folder-body"><div class="folder-name">Posters</div></div>
+        </div>
+        <div class="folder-previews">
+          <img class="folder-preview" src="images/posters/poster_03_gaoding1.webp" style="--delay:0s;--pop-y:-95px;--rot:5deg;--x:22%" alt="Cozy Home Essentials">
+          <img class="folder-preview" src="images/posters/poster_07_spring.jpg" style="--delay:.1s;--pop-y:-130px;--rot:-4deg;--x:48%" alt="Spring Bloom">
+          <img class="folder-preview" src="images/posters/poster_06_ai3.jpg" style="--delay:.18s;--pop-y:-70px;--rot:2deg;--x:74%" alt="Qoo Apple">
+        </div>
+      </div>
+      <div class="folder-item" data-project="Vibe Coding Website">
+        <div class="folder-row">
+          <div class="folder-tab-label">03</div>
+          <div class="folder-body"><div class="folder-name">Vibe Coding Website</div></div>
+        </div>
+        <div class="folder-previews">
+          <img class="folder-preview" src="images/websites/web_03_sudoku.png" style="--delay:0s;--pop-y:-85px;--rot:-5deg;--x:18%" alt="像素数独">
+          <img class="folder-preview" src="images/websites/web_01_emoji.png" style="--delay:.08s;--pop-y:-120px;--rot:3deg;--x:44%" alt="Emoji 情绪小岛">
+          <img class="folder-preview" src="images/websites/web_08_pin.png" style="--delay:.16s;--pop-y:-60px;--rot:-2deg;--x:70%" alt="捏捏盲盒">
+        </div>
+      </div>
+      <div class="folder-item" data-project="Videos">
+        <div class="folder-row">
+          <div class="folder-tab-label">04</div>
+          <div class="folder-body"><div class="folder-name">Videos</div></div>
+        </div>
+        <div class="folder-previews">
+          <img class="folder-preview" src="images/videos/cover_01_ad.jpg" style="--delay:0s;--pop-y:-100px;--rot:6deg;--x:20%" alt="">
+          <img class="folder-preview" src="images/videos/cover_02_pixar.jpg" style="--delay:.1s;--pop-y:-135px;--rot:-3deg;--x:46%" alt="">
+          <img class="folder-preview" src="images/videos/cover_03_product.jpg" style="--delay:.18s;--pop-y:-75px;--rot:4deg;--x:72%" alt="">
+        </div>
+      </div>
+      <div class="folder-item" data-project="北辰青年Work">
+        <div class="folder-row">
+          <div class="folder-tab-label">05</div>
+          <div class="folder-body"><div class="folder-name">北辰青年 Work</div></div>
+        </div>
+        <div class="folder-previews">
+          <img class="folder-preview" src="images/bcyy/01_personal_manual.jpg" style="--delay:0s;--pop-y:-80px;--rot:-4deg;--x:18%" alt="">
+          <img class="folder-preview" src="images/bcyy/02_emoji_team.png" style="--delay:.1s;--pop-y:-120px;--rot:5deg;--x:42%" alt="">
+          <img class="folder-preview" src="images/bcyy/07_recruit_joinus.jpg" style="--delay:.2s;--pop-y:-60px;--rot:-2deg;--x:68%" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 项目详情弹窗 -->
+  <div class="project-modal" id="projectModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Project</h3>
+        <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-gallery" id="modalGallery">
+        <div class="placeholder">图片占位 1</div>
+        <div class="placeholder">图片占位 2</div>
+        <div class="placeholder">图片占位 3</div>
+        <div class="placeholder">图片占位 4</div>
+      </div>
+    </div>
+  </div>
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="contact-figure">
+        <h2 class="contact-title">Contact Me</h2>
+        <img src="images/contact_girl.png" alt="Contact me character" class="contact-girl">
+      </div>
+      <div class="contact-info">
+        <div class="contact-card">
+          <div class="contact-hello">Say hi <span>👋</span></div>
+          <a href="tel:18136728971" class="contact-row">
+            <span class="contact-icon">📱</span>
+            <span class="contact-label">Phone</span>
+            <span class="contact-value">18136728971</span>
+          </a>
+          <a href="mailto:1486326174@qq.com" class="contact-row">
+            <span class="contact-icon">✉️</span>
+            <span class="contact-label">Email</span>
+            <span class="contact-value">1486326174@qq.com</span>
+          </a>
+          <p class="contact-note">欢迎找我聊运营、内容、AI 创作，或者直接点开上面的 Projects 看看我做过的东西。</p>
+        </div>
+      </div>
+    </div>
+    <footer class="site-footer">© 2026 面包大王 · Made with Vibe Coding 💜</footer>
+  </section>
+
+<script>
+  // ===== mac 风格指针跟随 =====
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('ring');
+  const scene = document.getElementById('scene');
+  const folder = document.getElementById('folder');
+  // 箭头尖端在 30px 光标内的坐标（viewBox 22 → 显示 30，比例 30/22）
+  const TIP_X = 6.1, TIP_Y = 3.4;
+  let mx=0, my=0;              // 鼠标位置
+  let rx=0, ry=0;              // 指针圆环的阻尼位置
+  let eyeTargetX=0, eyeTargetY=0, eyeCurrX=0, eyeCurrY=0;
+  let lastEyeX=999, lastEyeY=999, lastRingX=999, lastRingY=999;
+  const rootStyle = document.documentElement.style;   // 预先取好，避免 tick 首帧 TDZ 报错
+
+  // folder 的 rect 缓存：只在 resize / scroll 时标脏，避免每帧强制布局
+  let folderRect = null, rectDirty = true;
+  const markDirty = () => { rectDirty = true; };
+  window.addEventListener('resize', markDirty);
+  window.addEventListener('scroll', markDirty, { passive:true });
+
+  function updateCursor(){
+    const s = document.body.classList.contains('hovering') ? 0.45 : 1;
+    cursor.style.transform = `translate(${mx - TIP_X}px, ${my - TIP_Y}px) scale(${s})`;
+  }
+
+  // 单一 mousemove 监听器
+  window.addEventListener('mousemove', (e)=>{
+    mx = e.clientX; my = e.clientY;
+    updateCursor();
+  });
+
+  // 单一 RAF 循环，同时驱动指针圆环 + 眼睛；值变化不明显时跳过 DOM 写入
+  function tick(){
+    // 1) 先读布局（每帧最多一次，且脏了才读）
+    if (rectDirty || !folderRect){
+      folderRect = folder.getBoundingClientRect();
+      rectDirty = false;
+    }
+
+    // 2) 眼睛目标值
+    const fcx = folderRect.left + folderRect.width / 2;
+    const fcy = folderRect.top + folderRect.height / 2;
+    const dx = mx - fcx, dy = my - fcy;
+    const dist = Math.max(1, Math.sqrt(dx*dx + dy*dy));
+    const norm = Math.min(1, dist / 700);
+    const moveScale = folderRect.width * 0.026;
+    eyeTargetX = (dx / dist) * norm * moveScale;
+    eyeTargetY = (dy / dist) * norm * moveScale;
+
+    // 3) 阻尼
+    eyeCurrX += (eyeTargetX - eyeCurrX) * 0.18;
+    eyeCurrY += (eyeTargetY - eyeCurrY) * 0.18;
+    rx += (mx - rx) * 0.18;
+    ry += (my - ry) * 0.18;
+
+    // 4) 写 DOM（仅当变化可感知时）
+    if (Math.abs(eyeCurrX - lastEyeX) > 0.03 || Math.abs(eyeCurrY - lastEyeY) > 0.03){
+      rootStyle.setProperty('--eye-tx', eyeCurrX.toFixed(2) + 'px');
+      rootStyle.setProperty('--eye-ty', eyeCurrY.toFixed(2) + 'px');
+      lastEyeX = eyeCurrX; lastEyeY = eyeCurrY;
+    }
+    if (Math.abs(rx - lastRingX) > 0.2 || Math.abs(ry - lastRingY) > 0.2){
+      const s = document.body.classList.contains('hovering') ? 'scale(1)' : 'scale(0)';
+      ring.style.transform = `translate(${rx.toFixed(1)}px, ${ry.toFixed(1)}px) translate(-50%,-50%) ${s}`;
+      lastRingX = rx; lastRingY = ry;
+    }
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  const hoverEls = document.querySelectorAll('a, button, .folder, .card, .folder-item, .modal-close, .nav-links a');
+  hoverEls.forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{ document.body.classList.add('hovering'); updateCursor(); });
+    el.addEventListener('mouseleave', ()=>{ document.body.classList.remove('hovering'); updateCursor(); });
+  });
+
+  // ===== 点击文件夹弹出卡片 =====
+  folder.addEventListener('click', ()=>{
+    scene.classList.toggle('open');
+  });
+
+  // ===== 3D 模型懒加载：滚到 About 附近才加载 31MB 的 glb =====
+  const charModel = document.getElementById('charModel');
+  const aboutSection = document.getElementById('about');
+  if (charModel && aboutSection) {
+    let modelLoaded = false;
+    const loadModel = () => {
+      if (modelLoaded) return;
+      modelLoaded = true;
+      // 动态加载本地 model-viewer（首屏不阻塞、不依赖外部 CDN）
+      if (!customElements.get('model-viewer')) {
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.src = 'vendor/model-viewer.min.js';
+        document.head.appendChild(s);
+      }
+      // 等自定义元素注册完成后再赋 src，确保 3D 正常加载
+      const setSrc = () => charModel.setAttribute('src', 'images/character.glb');
+      if (customElements.get('model-viewer')) setSrc();
+      else customElements.whenDefined('model-viewer').then(setSrc);
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            loadModel();
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: '300px' });
+      io.observe(aboutSection);
+    } else {
+      loadModel();
+    }
+  }
+
+  // ===== 导航高亮（滚动联动） =====
+  const links = document.querySelectorAll('.nav-links a');
+  const sections = ['home','about','projects','contact'].map(id=>document.getElementById(id));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        links.forEach(l=> l.classList.toggle('active', l.dataset.target === en.target.id));
+      }
+    });
+  }, { threshold:0.5 });
+  sections.forEach(s=> obs.observe(s));
+
+  // ===== Projects 文件夹：点击打开详情弹窗 =====
+  const modal = document.getElementById('projectModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalGallery = document.getElementById('modalGallery');
+  const modalClose = document.getElementById('modalClose');
+  const folderItems = document.querySelectorAll('.folder-item');
+
+  folderItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const title = item.dataset.project;
+
+      // PPT 单独打开全屏页面，完整展示全部 27 页
+      if (title === 'PPT') {
+        window.open('ppt.html', '_blank');
+        return;
+      }
+
+      // Posters 单独打开旋转图片环页面
+      if (title === 'Posters') {
+        window.open('posters.html', '_blank');
+        return;
+      }
+
+      // Vibe Coding Website 单独打开 8 个网站列表页
+      if (title === 'Vibe Coding Website') {
+        window.open('websites.html', '_blank');
+        return;
+      }
+
+      // Videos 单独打开视频播放页
+      if (title === 'Videos') {
+        window.open('videos.html', '_blank');
+        return;
+      }
+
+      // 北辰青年 Work 单独打开作品集合页
+      if (title === '北辰青年Work') {
+        window.open('bcyy.html', '_blank');
+        return;
+      }
+
+      modalTitle.textContent = title;
+      modalGallery.innerHTML = `
+        <div class="placeholder">${title} - 图片 1（待替换）</div>
+        <div class="placeholder">${title} - 图片 2（待替换）</div>
+        <div class="placeholder">${title} - 图片 3（待替换）</div>
+        <div class="placeholder">${title} - 图片 4（待替换）</div>
+      `;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeModal(){
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{
+    if(e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+  });
+</script>
+</body>
+</html>
